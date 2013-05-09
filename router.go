@@ -38,8 +38,7 @@ HEAD "/users/image_url":
 
     func (*Users) ImageUrl (ctx *jas.Context {}
 
- */
-
+*/
 package jas
 
 import (
