@@ -92,13 +92,13 @@ type Config struct {
 	InternalErrorLogger *log.Logger
 
 	//If set, it will be called after recovered from panic.
-	//Do time consuming work in the function will not reduce response time because it runs in its own goroutine.
+	//Do time consuming work in the function will not increase response time because it runs in its own goroutine.
 	OnAppError func (AppError, *Context)
 
-	//If set, it will be called before calling the matched mathod.
+	//If set, it will be called before calling the matched method.
 	BeforeServe func (*Context)
 
-	//If set, the user id can be obtained by *Context.UserId() and will be logged on error
+	//If set, the user id can be obtained by *Context.UserId and will be logged on error.
 	//Implementations can be like decode cookie value or token parameter.
 	ParseIdFunc func (*http.Request) int64
 
@@ -291,6 +291,7 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonbytes)
 }
 
+//This is an implementation of HandleCORS function to allow all cross domain request.
 func AllowCORS(r *http.Request, responseHeader http.Header) bool {
 	responseHeader.Add("Access-Control-Allow-Origin", "*")
 	if r.Method == "OPTIONS" {

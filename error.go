@@ -11,10 +11,8 @@ import (
 	"time"
 )
 
-//Default status code for request error, can be changed to the code you want.
 var RequestErrorStatusCode = 400
 
-//Default status code for internal error, can be changed to the code you want.
 var InternalErrorStatusCode = 500
 
 var UnauthorizedStatusCode = 401
@@ -49,6 +47,7 @@ type AppError interface {
 	Log(*Context)
 }
 
+//RequestError is an AppError implementation which Error() and Message() returns the same string.
 type RequestError struct {
 	Msg string
 	StatusCode int
@@ -70,6 +69,12 @@ func (re RequestError) Log(context *Context){
 	}
 }
 
+
+//InternalError is an AppError implementation which
+//returns "InternalError" message to the client
+//and logs the wrapped error and stack trace in Common Log Format.
+//any panic during a session will be recovered and wrapped in InternalError
+//and then logged.
 type InternalError struct {
 	Err error
 	StatusCode int
@@ -125,11 +130,12 @@ func doLog(logger *log.Logger, context *Context, err error, stack string){
 	)
 }
 
-//Request error's message will be sent to the client.
+//Make an RequestError with message which will be sent to the client.
 func NewRequestError(message string) RequestError{
 	return RequestError{message, RequestErrorStatusCode}
 }
 
+//Wrap an error to InternalError
 func NewInternalError(err interface {}) InternalError{
 	e, ok := err.(error);
 	if !ok {
