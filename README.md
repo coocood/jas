@@ -89,11 +89,16 @@ Find methods will return err if the parameter value is invalid.
 Require methods will stop the execution in the method and respond an error message if the parameter value is invalid.
 
     func (*Hello) Foo (ctx *jas.Context) {
-        name := ctx.RequireString("name") // will stop execution and response `{"data":null,"error":"nameInvalid"} if "name" parameter is not provided.
+        // will stop execution and response `{"data":null,"error":"nameInvalid"} if "name" parameter is not provided.
+        name := ctx.RequireString("name")
         age := ctx.RequirePositiveInt("age")
         grade, err := ctx.FindPositiveInt("grade")
-        password := ctx.RequireStringLen(6, 60, "password") // 6, 60 is the min and max length, error message can be "passwordTooShort" or "passwordTooLong"
-        email := ctx.RequireStringMatch(emailRegexp, "email") // emailRegexp is a *regexp.Regexp instance.error message would be "emailInvalid"
+
+        // 6, 60 is the min and max length, error message can be "passwordTooShort" or "passwordTooLong"
+        password := ctx.RequireStringLen(6, 60, "password")
+
+        // emailRegexp is a *regexp.Regexp instance.error message would be "emailInvalid"
+        email := ctx.RequireStringMatch(emailRegexp, "email")
         _, _, _, _, _, _ = name, age, grade, err,password, email
     }
 
