@@ -119,6 +119,10 @@ type Config struct {
 
 //Implements http.Handler interface.
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, router.BasePath) {
+		router.OnNotFound(w, r)
+		return
+	}
 	rawPath := r.URL.Path[len(router.BasePath):]
 	path, id, segments, gaps := router.resolvePath(r.Method, rawPath)
 	methodValue, ok := router.methodMap[path]
