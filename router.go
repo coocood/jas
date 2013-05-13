@@ -1,44 +1,4 @@
-/*
-A resource is a struct pointer with one or more exported methods
-that accepts only one parameter of type *jas.Context, The resource name and method
-name will be converted to snake case by default.(can be changed in config).
 
-If resource type name ends with "Id", an integer path segment is added between the resource name
-and the method name.
-
-If resource method name ends with "Id", an integer path segment is added to the handled path after the method name.
-
-You can get the Id value directly in *jas.Context field.
-
-If resource implements ResourceWithGap interface, the handled path will has gap segments between resource name and method name.
-
-HTTP "POST", "PUT", "DELETE" will be routed to resource methods with "Post", "Put", "Delete" prefix.
-HTTP "GET" will be routed to resource methods with or without "Get" prefix.
-Other HTTP request with methods like "HEAD", "OPTIONS" will be routed to resource "Get" method.
-
-Examples:
-
-GET "/users/image_url":
-
-    func (u *Users) ImageUrl (ctx *jas.Context) {}
-
-GET "/users/5/image_url":
-
-    func (ui *UsersId) ImageUrl (ctx *jas.Context) {}
-
-GET "/image_url":
-
-    func (*UsersOmit) ImageUrl (ctx *jas.Context) {}
-
-POST "/users/image_url":
-
-    func (*Users) PostImageUrl (ctx *jas.Context) {}
-
-HEAD "/users/image_url":
-
-    func (*Users) ImageUrl (ctx *jas.Context {}
-
-*/
 package jas
 
 import (
