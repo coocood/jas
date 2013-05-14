@@ -33,6 +33,14 @@ and provide a optional function parameter to do the extra error handlling work.
 
 * Highly configuarable.
 
+##Performance
+
+JAS is a thin layer on top of new/http package, it adds about 1000ns operation time on every request, which means 99% of the performance when the qps number is around 10000.
+
+But JAS will be faster than any regular expression routing solution. a single regular experssion match operation usually takes about 1000ns.
+
+JAS router do not use regular expression, the routing performance would be constant as you define more resource and methods.
+
 ##Install
 
     go get github.com/coocood/jas
