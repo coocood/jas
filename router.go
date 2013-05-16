@@ -75,6 +75,12 @@ type Config struct {
 	//The errMessage is of type string or nil, it's not AppError.
 	//it should return the number of bytes has been written.
 	HijackWrite func (io.Writer, *Context) int
+
+	//If set to true, json request body will not be unmarshaled in Finder automatically.
+	//Then you will be able to call `Unmarshal` to unmarshal the body to a struct.
+	//If you still want to get body parameter with Finder methods in some cases, you can call `UnmarshalInFinder`
+	//explicitly before you get body parameters with Finder methods.
+	DisableAutoUnmarshal bool
 }
 
 //Implements http.Handler interface.
@@ -96,6 +102,9 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx.Request = r
 	ctx.gaps = gaps
 	ctx.Finder = FinderWithRequest(r)
+	if !router.DisableAutoUnmarshal {
+		ctx.UnmarshalInFinder()
+	}
 	ctx.ResponseHeader = w.Header()
 	ctx.config = router.Config
 	ctx.responseWriter = w

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"compress/gzip"
+	"errors"
+	"strings"
 )
 
 type Response struct {
@@ -33,6 +35,8 @@ type Context struct {
 	pathSegments    []string
 	gaps            []string
 }
+
+var NoJsonBody = errors.New("jas.Context: no json body")
 
 //Write and flush the data.
 //It can be used for http streaming or to write a portion of large amount of data.
@@ -174,4 +178,29 @@ func (ctx *Context) RequireUserId() int64 {
 		panic(requerstError)
 	}
 	return ctx.UserId
+}
+
+//Unmarshal the request body into the interface.
+//It only works when you set Config option `DisableAutoUnmarshal` to true.
+func (ctx *Context) Unmarshal(in interface {}) error {
+	if !ctx.config.DisableAutoUnmarshal {
+		panic("Should only call it when  'DisableAutoUnmarshal' is set to true")
+	}
+	if ctx.ContentLength > 0 && strings.Contains(ctx.Header.Get("Content-Type"), "application/json") {
+		decoder := json.NewDecoder(ctx.Body)
+		decoder.UseNumber()
+		return decoder.Decode(in)
+	}
+	return NoJsonBody
+}
+
+//If set Config option `DisableAutoUnmarshal` to true, you should call this method first before you can get body parameters in Finder methods..
+func (ctx *Context) UnmarshalInFinder() {
+	if ctx.value == nil && ctx.ContentLength > 0 && strings.Contains(ctx.Header.Get("Content-Type"), "application/json"){
+		var in interface {}
+		decoder := json.NewDecoder(ctx.Body)
+		decoder.UseNumber()
+		ctx.err = decoder.Decode(&in)
+		ctx.value = in
+	}
 }

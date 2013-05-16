@@ -5,14 +5,62 @@ import (
 	"testing"
 	"github.com/coocood/assrt"
 	"regexp"
+	"net/http/httptest"
 )
+
+const (
+	jsonData = `{"a":"","b":null,"c":true,"d":12,"e":"str"}`
+)
+
+type JsonModel struct {
+	A string `json:"a"`
+	B interface {} `json:"b"`
+	C bool `json:"c"`
+	D int `json:"d"`
+	E string `json:"e"`
+}
+
+type UnmarshalRes struct {}
+
+
+func (*UnmarshalRes) Post(ctx *Context){
+	ctx.Data, _ = ctx.FindMap()
+}
+
+func (*UnmarshalRes) PostUnmarshal(ctx *Context) {
+	jm := JsonModel{}
+	err := ctx.Unmarshal(&jm)
+	if err == nil {
+		ctx.Data = jm
+	}else {
+		ctx.Error = NewRequestError("invalid json body")
+	}
+}
+
+func TestUnmarshal(t *testing.T) {
+	req := NewPostJsonRequest("", "/unmarshal_res", []byte(jsonData))
+	router := NewRouter(new(UnmarshalRes))
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, req)
+	assert := assrt.NewAssert(t)
+	assert.Equal(`{"data":{"a":"","b":null,"c":true,"d":12,"e":"str"},"error":null}`, recorder.Body.String())
+
+	req = NewPostJsonRequest("", "/unmarshal_res/unmarshal", []byte(jsonData))
+	router.DisableAutoUnmarshal = true
+	recorder = httptest.NewRecorder()
+	router.ServeHTTP(recorder, req)
+	assert.Equal(`{"data":{"a":"","b":null,"c":true,"d":12,"e":"str"},"error":null}`, recorder.Body.String())
+}
 
 
 func TestFinderString(t *testing.T){
 	assert := assrt.NewAssert(t)
-	s := `{"a":"","b":null,"c":true,"d":12, "e":"str"}`
-	req := NewPostJsonRequest("", "", []byte(s), "e", "E", "o", "O")
-	f := FinderWithRequest(req)
+	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "e", "E", "o", "O")
+	ctx := new(Context)
+	ctx.Request = req
+	ctx.Finder = FinderWithRequest(req)
+	ctx.UnmarshalInFinder()
+	f := ctx.Finder
 	_, err := f.FindString("a")
 	assert.Equal(EmptyStringError, err)
 	_, err = f.FindString("b")
@@ -28,6 +76,20 @@ func TestFinderString(t *testing.T){
 	assert.Equal(EntryNotExistsError, err)
 	o, err := f.FindString("o")
 	assert.Equal("O", o)
+
+	req = NewPostJsonRequest("", "/test_finder", []byte(jsonData))
+	ctx = new(Context)
+	ctx.config = new(Config)
+	ctx.config.DisableAutoUnmarshal = true
+	ctx.Request = req
+	ctx.Finder = FinderWithRequest(req)
+	tb := JsonModel{}
+	ctx.Unmarshal(&tb)
+	assert.Equal("", tb.A)
+	assert.Nil(tb.B)
+	assert.True(tb.C)
+	assert.Equal(12, tb.D)
+	assert.Equal("str",tb.E)
 }
 
 

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"net/http"
-	"strings"
 	"bytes"
 	"regexp"
 )
@@ -40,11 +39,13 @@ var TooLongError = errors.New("jas.Finder: string too long")
 var NotPositiveError = errors.New("jas.Finder: not positive")
 var DoNotMatchError = errors.New("jas.Finder: do not match")
 
+
 var InvalidErrorFormat = "%vInvalid"
 var NotPositiveErrorFormat = "%vNotPositive"
 var TooShortErrorFormat = "%vTooShort"
 var TooLongErrorFormat = "%vTooLong"
 var MalformedJsonBody = "MalformedJsonBody"
+
 
 func (finder Finder) FindString(paths ...interface {}) (string, error) {
 	if s := finder.findFormString(paths...); s != "" {
@@ -306,17 +307,11 @@ func (finder Finder) FindChild(paths ...interface {}) Finder {
 	return finder
 }
 
+
 //Construct a Finder with *http.Request.
 func FinderWithRequest(req *http.Request) Finder {
 	finder := Finder{}
 	finder.req = req
-	if req.ContentLength > 0 && strings.Contains(req.Header.Get("Content-Type"), "application/json") {
-		var in interface {}
-		decoder := json.NewDecoder(req.Body)
-		decoder.UseNumber()
-		finder.err = decoder.Decode(&in)
-		finder.value = in
-	}
 	return finder
 }
 
