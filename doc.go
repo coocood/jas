@@ -119,6 +119,14 @@ string argument to get value from json object, int argumnet to get value form js
         id:= ctx.RequirePositiveInt("photo", 1, "id") //200
     }
 
+If you want unmarshal json body to struct, the `DisableAutoUnmarshal` option must be set to true.
+
+	router.DisableAutoUnmarshal = true
+
+Then you can call `Unmarshal` method to unmarshal json body:
+
+	ctx.Unmarshal(&myStruct)
+
 HTTP streaming :
 
 FlushData will write []byte data without any modification, other data types will be marshaled to json format.
