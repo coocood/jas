@@ -35,7 +35,7 @@ and provide a optional function parameter to do the extra error handlling work.
 
 ##Performance
 
-JAS is a thin layer on top of new/http package, it adds about 1000ns operation time on every request, which means 99% of the performance when the qps number is around 10000.
+JAS is a thin layer on top of net/http package, it adds about 1000ns operation time on every request, which means 99% of the performance when the qps number is around 10000.
 
 But JAS will be faster than any regular expression routing solution. a single regular experssion match operation usually takes about 1000ns.
 
