@@ -1,19 +1,19 @@
 package jas
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"net/http"
 	"net/url"
-	"fmt"
 	"strings"
-	"bytes"
-	"io"
 )
 
 const (
 	baseLocal = "http://localhost/"
 )
 
-func NewGetRequest(baseUrlOrPath, path string, nameValues ...interface {}) *http.Request {
+func NewGetRequest(baseUrlOrPath, path string, nameValues ...interface{}) *http.Request {
 	url := concateUrl(baseUrlOrPath, path)
 	if len(nameValues) > 0 {
 		query := NameValuesToUrlValues(nameValues...).Encode()
@@ -25,7 +25,7 @@ func NewGetRequest(baseUrlOrPath, path string, nameValues ...interface {}) *http
 	return req
 }
 
-func NewPostFormRequest(baseUrlOrPath, path string, nameValues ...interface {}) *http.Request {
+func NewPostFormRequest(baseUrlOrPath, path string, nameValues ...interface{}) *http.Request {
 	var reader io.Reader
 	if len(nameValues) > 0 {
 		pairs := NameValuesToUrlValues(nameValues...)
@@ -36,7 +36,7 @@ func NewPostFormRequest(baseUrlOrPath, path string, nameValues ...interface {}) 
 	return req
 }
 
-func NewPostJsonRequest(baseUrlOrPath, path string, jsonData []byte, nameValues ...interface {}) *http.Request{
+func NewPostJsonRequest(baseUrlOrPath, path string, jsonData []byte, nameValues ...interface{}) *http.Request {
 	url := concateUrl(baseUrlOrPath, path)
 	if len(nameValues) > 0 {
 		query := NameValuesToUrlValues(nameValues...).Encode()
@@ -49,23 +49,23 @@ func NewPostJsonRequest(baseUrlOrPath, path string, jsonData []byte, nameValues 
 	return req
 }
 
-func NameValuesToUrlValues (nameValues ...interface {}) url.Values {
+func NameValuesToUrlValues(nameValues ...interface{}) url.Values {
 	if len(nameValues)%2 != 0 {
 		panic(fmt.Sprint("name value pair not even:", nameValues, len(nameValues)))
 	}
 	nameValuesStrings := make([]string, len(nameValues))
-	for i := 0; i < len(nameValues); i++{
+	for i := 0; i < len(nameValues); i++ {
 		value := nameValues[i]
 		var str string
 		if byt, ok := value.([]byte); ok {
 			str = string(byt)
-		}else{
+		} else {
 			str = fmt.Sprint(value)
 		}
 		nameValuesStrings[i] = str
 	}
 	values := url.Values{}
-	for i := 0; i < len(nameValuesStrings); i+=2 {
+	for i := 0; i < len(nameValuesStrings); i += 2 {
 		values.Set(nameValuesStrings[i], nameValuesStrings[i+1])
 	}
 	return values
@@ -74,8 +74,8 @@ func NameValuesToUrlValues (nameValues ...interface {}) url.Values {
 func concateUrl(base, path string) string {
 	if base == "" {
 		base = baseLocal
-	}else if !strings.HasPrefix(base, "http") {
-		if	base[0] == '/' {
+	} else if !strings.HasPrefix(base, "http") {
+		if base[0] == '/' {
 			base = base[1:]
 		}
 		base = baseLocal + base

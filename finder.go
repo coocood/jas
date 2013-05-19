@@ -1,13 +1,13 @@
 package jas
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"net/http"
-	"bytes"
 	"regexp"
+	"strconv"
 )
 
 //Finder is a accessor and validator with an unified interface to get parameters from both http request form and json body.
@@ -21,9 +21,9 @@ import (
 
 //All the "Find" methods return error, All the "Require" methods do panic with RequestError when error occured.
 type Finder struct {
-	value interface {}
+	value interface{}
 	err   error
-	req *http.Request
+	req   *http.Request
 }
 
 var WrongTypeError = errors.New("jas.Finder: wrong type")
@@ -39,15 +39,13 @@ var TooLongError = errors.New("jas.Finder: string too long")
 var NotPositiveError = errors.New("jas.Finder: not positive")
 var DoNotMatchError = errors.New("jas.Finder: do not match")
 
-
 var InvalidErrorFormat = "%vInvalid"
 var NotPositiveErrorFormat = "%vNotPositive"
 var TooShortErrorFormat = "%vTooShort"
 var TooLongErrorFormat = "%vTooLong"
 var MalformedJsonBody = "MalformedJsonBody"
 
-
-func (finder Finder) FindString(paths ...interface {}) (string, error) {
+func (finder Finder) FindString(paths ...interface{}) (string, error) {
 	if s := finder.findFormString(paths...); s != "" {
 		return s, nil
 	}
@@ -64,7 +62,7 @@ func (finder Finder) FindString(paths ...interface {}) (string, error) {
 	return "", WrongTypeError
 }
 
-func (finder Finder) FindStringLen(min, max int, paths ...interface {}) (string, error) {
+func (finder Finder) FindStringLen(min, max int, paths ...interface{}) (string, error) {
 	s, err := finder.FindString(paths...)
 	if err != nil {
 		return s, err
@@ -78,7 +76,7 @@ func (finder Finder) FindStringLen(min, max int, paths ...interface {}) (string,
 	return s, nil
 }
 
-func (finder Finder) FindStringRuneLen(min, max int, paths ...interface {}) (string, error) {
+func (finder Finder) FindStringRuneLen(min, max int, paths ...interface{}) (string, error) {
 	s, err := finder.FindString(paths...)
 	if err != nil {
 		return s, err
@@ -96,7 +94,7 @@ func (finder Finder) FindStringRuneLen(min, max int, paths ...interface {}) (str
 	return s, nil
 }
 
-func (finder Finder) FindStringMatch(reg *regexp.Regexp, paths ... interface {}) (string, error) {
+func (finder Finder) FindStringMatch(reg *regexp.Regexp, paths ...interface{}) (string, error) {
 	s, err := finder.FindString(paths...)
 	if err != nil {
 		return s, err
@@ -107,12 +105,12 @@ func (finder Finder) FindStringMatch(reg *regexp.Regexp, paths ... interface {})
 	return s, nil
 }
 
-func (finder Finder) FindSlice(paths ...interface {}) ([]interface {}, error) {
+func (finder Finder) FindSlice(paths ...interface{}) ([]interface{}, error) {
 	finder = finder.FindChild(paths...)
 	if finder.err != nil {
 		return nil, finder.err
 	}
-	if s, ok := finder.value.([]interface {}); ok {
+	if s, ok := finder.value.([]interface{}); ok {
 		if len(s) == 0 {
 			return s, EmptySliceError
 		}
@@ -121,9 +119,7 @@ func (finder Finder) FindSlice(paths ...interface {}) ([]interface {}, error) {
 	return nil, WrongTypeError
 }
 
-
-
-func (finder Finder) RequireSlice(paths ...interface {}) []interface {} {
+func (finder Finder) RequireSlice(paths ...interface{}) []interface{} {
 	s, err := finder.FindSlice(paths...)
 	if err != nil {
 		doPanic(InvalidErrorFormat, paths...)
@@ -131,7 +127,7 @@ func (finder Finder) RequireSlice(paths ...interface {}) []interface {} {
 	return s
 }
 
-func (finder Finder) RequireStringLen(min, max int, paths ...interface {}) string {
+func (finder Finder) RequireStringLen(min, max int, paths ...interface{}) string {
 	s := finder.RequireString(paths...)
 	if len(s) < min {
 		doPanic(TooShortErrorFormat, paths...)
@@ -142,7 +138,7 @@ func (finder Finder) RequireStringLen(min, max int, paths ...interface {}) strin
 	return s
 }
 
-func (finder Finder) RequireStringRuneLen(min, max int, paths ...interface {}) string {
+func (finder Finder) RequireStringRuneLen(min, max int, paths ...interface{}) string {
 	s := finder.RequireString(paths...)
 	count := 0
 	for _ = range s {
@@ -157,7 +153,7 @@ func (finder Finder) RequireStringRuneLen(min, max int, paths ...interface {}) s
 	return s
 }
 
-func (finder Finder) RequireStringMatch(reg *regexp.Regexp, paths ...interface {}) string {
+func (finder Finder) RequireStringMatch(reg *regexp.Regexp, paths ...interface{}) string {
 	s := finder.RequireString(paths...)
 	if !reg.MatchString(s) {
 		doPanic(InvalidErrorFormat, paths...)
@@ -165,12 +161,12 @@ func (finder Finder) RequireStringMatch(reg *regexp.Regexp, paths ...interface {
 	return s
 }
 
-func (finder Finder) FindMap(paths ...interface {}) (map[string]interface {}, error) {
+func (finder Finder) FindMap(paths ...interface{}) (map[string]interface{}, error) {
 	finder = finder.FindChild(paths...)
 	if finder.err != nil {
 		return nil, finder.err
 	}
-	if m, ok := finder.value.(map[string]interface {}); ok {
+	if m, ok := finder.value.(map[string]interface{}); ok {
 		if len(m) == 0 {
 			return m, EmptyMapError
 		}
@@ -179,7 +175,7 @@ func (finder Finder) FindMap(paths ...interface {}) (map[string]interface {}, er
 	return nil, WrongTypeError
 }
 
-func (finder Finder) RequireMap(paths ...interface {}) map[string]interface {} {
+func (finder Finder) RequireMap(paths ...interface{}) map[string]interface{} {
 	m, err := finder.FindMap(paths...)
 	if err != nil {
 		doPanic(InvalidErrorFormat, paths...)
@@ -187,7 +183,7 @@ func (finder Finder) RequireMap(paths ...interface {}) map[string]interface {} {
 	return m
 }
 
-func (finder Finder) RequireString(paths ...interface {}) string {
+func (finder Finder) RequireString(paths ...interface{}) string {
 	s, err := finder.FindString(paths...)
 	if err != nil {
 		doPanic(InvalidErrorFormat, paths...)
@@ -195,7 +191,7 @@ func (finder Finder) RequireString(paths ...interface {}) string {
 	return s
 }
 
-func (finder Finder) FindInt(paths ...interface {}) (int64, error) {
+func (finder Finder) FindInt(paths ...interface{}) (int64, error) {
 	if s := finder.findFormString(paths...); s != "" {
 		return strconv.ParseInt(s, 10, 64)
 	}
@@ -206,7 +202,7 @@ func (finder Finder) FindInt(paths ...interface {}) (int64, error) {
 	return num.Int64()
 }
 
-func (finder Finder) FindPositiveInt(paths ...interface {}) (int64, error) {
+func (finder Finder) FindPositiveInt(paths ...interface{}) (int64, error) {
 	integer, err := finder.FindInt(paths...)
 	if err != nil {
 		return integer, err
@@ -217,7 +213,7 @@ func (finder Finder) FindPositiveInt(paths ...interface {}) (int64, error) {
 	return integer, nil
 }
 
-func (finder Finder) RequireInt(paths ...interface {}) int64 {
+func (finder Finder) RequireInt(paths ...interface{}) int64 {
 	i, err := finder.FindInt(paths...)
 	if err != nil {
 		doPanic(InvalidErrorFormat, paths...)
@@ -225,7 +221,7 @@ func (finder Finder) RequireInt(paths ...interface {}) int64 {
 	return i
 }
 
-func (finder Finder) RequirePositiveInt(paths ...interface {}) int64 {
+func (finder Finder) RequirePositiveInt(paths ...interface{}) int64 {
 	i := finder.RequireInt(paths...)
 	if i <= 0 {
 		doPanic(NotPositiveErrorFormat, paths...)
@@ -233,7 +229,7 @@ func (finder Finder) RequirePositiveInt(paths ...interface {}) int64 {
 	return i
 }
 
-func (finder Finder) FindFloat(paths ...interface {}) (float64, error) {
+func (finder Finder) FindFloat(paths ...interface{}) (float64, error) {
 	if s := finder.findFormString(paths...); s != "" {
 		return strconv.ParseFloat(s, 64)
 	}
@@ -244,7 +240,7 @@ func (finder Finder) FindFloat(paths ...interface {}) (float64, error) {
 	return num.Float64()
 }
 
-func (finder Finder) RequireFloat(paths ...interface {}) float64 {
+func (finder Finder) RequireFloat(paths ...interface{}) float64 {
 	f, err := finder.FindFloat(paths...)
 	if err != nil {
 		doPanic(InvalidErrorFormat, paths...)
@@ -252,7 +248,7 @@ func (finder Finder) RequireFloat(paths ...interface {}) float64 {
 	return f
 }
 
-func (finder Finder) FindBool(paths ...interface {}) (bool, error) {
+func (finder Finder) FindBool(paths ...interface{}) (bool, error) {
 	if s := finder.findFormString(paths...); s != "" {
 		return strconv.ParseBool(s)
 	}
@@ -268,28 +264,28 @@ func (finder Finder) FindBool(paths ...interface {}) (bool, error) {
 
 // return the length of []interface or map[string]interface{}
 // return -1 if the value not found or has wrong type.
-func (finder Finder) Len(paths ...interface {}) int {
+func (finder Finder) Len(paths ...interface{}) int {
 	finder = finder.FindChild(paths...)
 	if finder.err != nil {
 		return -1
 	}
-	switch finder.value.(type){
-	case []interface {}:
-		return len(finder.value.([]interface {}))
-	case map[string]interface {}:
-		return len(finder.value.(map[string]interface {}))
+	switch finder.value.(type) {
+	case []interface{}:
+		return len(finder.value.([]interface{}))
+	case map[string]interface{}:
+		return len(finder.value.(map[string]interface{}))
 	}
 	return -1
 }
 
-func (finder Finder) FindChild(paths ...interface {}) Finder {
+func (finder Finder) FindChild(paths ...interface{}) Finder {
 	finder.req = nil
 	if finder.value == nil {
 		finder.err = NullValueError
 		return finder
 	}
 	for _, path := range paths {
-		switch path.(type){
+		switch path.(type) {
 		case string:
 			finder = finder.findChildInMap(path.(string))
 			if finder.err != nil {
@@ -307,7 +303,6 @@ func (finder Finder) FindChild(paths ...interface {}) Finder {
 	return finder
 }
 
-
 //Construct a Finder with *http.Request.
 func FinderWithRequest(req *http.Request) Finder {
 	finder := Finder{}
@@ -318,7 +313,7 @@ func FinderWithRequest(req *http.Request) Finder {
 //Construct a Finder with json formatted data.
 func FinderWithBytes(data []byte) Finder {
 	finder := Finder{}
-	var in interface {}
+	var in interface{}
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.UseNumber()
 	finder.err = decoder.Decode(&in)
@@ -327,7 +322,7 @@ func FinderWithBytes(data []byte) Finder {
 }
 
 func (finder Finder) findChildInSlice(index int) Finder {
-	slice, ok := finder.value.([]interface {})
+	slice, ok := finder.value.([]interface{})
 	if !ok {
 		finder.err = WrongTypeError
 		return finder
@@ -344,7 +339,7 @@ func (finder Finder) findChildInSlice(index int) Finder {
 }
 
 func (finder Finder) findChildInMap(key string) Finder {
-	m, ok := finder.value.(map[string]interface {})
+	m, ok := finder.value.(map[string]interface{})
 	if !ok {
 		finder.err = WrongTypeError
 		return finder
@@ -352,13 +347,13 @@ func (finder Finder) findChildInMap(key string) Finder {
 	finder.value, ok = m[key]
 	if !ok {
 		finder.err = EntryNotExistsError
-	}else if finder.value == nil {
+	} else if finder.value == nil {
 		finder.err = NullValueError
 	}
 	return finder
 }
 
-func (finder Finder) findNumber(paths ...interface {}) (json.Number, error) {
+func (finder Finder) findNumber(paths ...interface{}) (json.Number, error) {
 	finder = finder.FindChild(paths...)
 	if finder.err != nil {
 		return "", finder.err
@@ -369,10 +364,10 @@ func (finder Finder) findNumber(paths ...interface {}) (json.Number, error) {
 	return "", WrongTypeError
 }
 
-func doPanic(format string, paths ...interface {}) {
+func doPanic(format string, paths ...interface{}) {
 	keyPath := "value"
 	if len(paths) > 0 {
-		lastPath := paths[len(paths) - 1]
+		lastPath := paths[len(paths)-1]
 		if s, ok := lastPath.(string); ok {
 			keyPath = s
 		}
@@ -382,7 +377,7 @@ func doPanic(format string, paths ...interface {}) {
 	panic(requerstError)
 }
 
-func (finder Finder) findFormString(paths ...interface {}) string {
+func (finder Finder) findFormString(paths ...interface{}) string {
 	if finder.req != nil && len(paths) == 1 {
 		key, ok := paths[0].(string)
 		if ok {

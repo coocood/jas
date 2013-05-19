@@ -138,6 +138,5 @@ FlushData will write []byte data without any modification, other data types will
         }
     }
 
- */
+*/
 package jas
-

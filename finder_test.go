@@ -1,11 +1,10 @@
-
 package jas
 
 import (
-	"testing"
 	"github.com/coocood/assrt"
-	"regexp"
 	"net/http/httptest"
+	"regexp"
+	"testing"
 )
 
 const (
@@ -13,17 +12,16 @@ const (
 )
 
 type JsonModel struct {
-	A string `json:"a"`
-	B interface {} `json:"b"`
-	C bool `json:"c"`
-	D int `json:"d"`
-	E string `json:"e"`
+	A string      `json:"a"`
+	B interface{} `json:"b"`
+	C bool        `json:"c"`
+	D int         `json:"d"`
+	E string      `json:"e"`
 }
 
-type UnmarshalRes struct {}
+type UnmarshalRes struct{}
 
-
-func (*UnmarshalRes) Post(ctx *Context){
+func (*UnmarshalRes) Post(ctx *Context) {
 	ctx.Data, _ = ctx.FindMap()
 }
 
@@ -32,7 +30,7 @@ func (*UnmarshalRes) PostUnmarshal(ctx *Context) {
 	err := ctx.Unmarshal(&jm)
 	if err == nil {
 		ctx.Data = jm
-	}else {
+	} else {
 		ctx.Error = NewRequestError("invalid json body")
 	}
 }
@@ -52,8 +50,7 @@ func TestUnmarshal(t *testing.T) {
 	assert.Equal(`{"data":{"a":"","b":null,"c":true,"d":12,"e":"str"},"error":null}`, recorder.Body.String())
 }
 
-
-func TestFinderString(t *testing.T){
+func TestFinderString(t *testing.T) {
 	assert := assrt.NewAssert(t)
 	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "e", "E", "o", "O")
 	ctx := new(Context)
@@ -89,29 +86,28 @@ func TestFinderString(t *testing.T){
 	assert.Nil(tb.B)
 	assert.True(tb.C)
 	assert.Equal(12, tb.D)
-	assert.Equal("str",tb.E)
+	assert.Equal("str", tb.E)
 }
 
-
-func TestFinderInt(t *testing.T){
+func TestFinderInt(t *testing.T) {
 	assert := assrt.NewAssert(t)
 	req := NewGetRequest("", "", "a", 1, "b", 2)
 	f := FinderWithRequest(req)
 	a := f.RequireInt("a")
-	assert.Equal(1,a)
+	assert.Equal(1, a)
 	b := f.RequireInt("b")
-	assert.Equal(2,b)
+	assert.Equal(2, b)
 	jsonData := []byte(`{"chars":["a","b", "c"], "obj":{"x": 100}}`)
 	f = FinderWithBytes(jsonData)
 	assert.Equal("b", f.RequireString("chars", 1))
-	assert.Equal(100, f.RequireInt("obj","x"))
+	assert.Equal(100, f.RequireInt("obj", "x"))
 }
 
-func TestFinderStringLen(t *testing.T){
+func TestFinderStringLen(t *testing.T) {
 	assert := assrt.NewAssert(t)
 	req := NewGetRequest("", "", "a", "1234567", "b", "语言文字")
 	f := FinderWithRequest(req)
-	_, err := f.FindStringLen(8,10, "a")
+	_, err := f.FindStringLen(8, 10, "a")
 	assert.NotNil(err)
 	_, err = f.FindStringLen(3, 7, "a")
 	assert.NotNil(err)
@@ -127,7 +123,7 @@ func TestFinderStringLen(t *testing.T){
 
 func TestFinderRegexp(t *testing.T) {
 	assert := assrt.NewAssert(t)
-	req := NewGetRequest("","", "a", "abcderg", "b", "语言文字")
+	req := NewGetRequest("", "", "a", "abcderg", "b", "语言文字")
 	f := FinderWithRequest(req)
 	_, err := f.FindStringMatch(regexp.MustCompile("\\w+"), "a")
 	assert.Nil(err)

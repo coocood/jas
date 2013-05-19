@@ -1,17 +1,17 @@
 package jas
 
 import (
-	"net/http"
-	"encoding/json"
-	"io"
 	"compress/gzip"
+	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
 	"strings"
 )
 
 type Response struct {
-	Data  interface {} `json:"data"`
-	Error interface {} `json:"error"`
+	Data  interface{} `json:"data"`
+	Error interface{} `json:"error"`
 }
 
 //Context contains all the information for a single request.
@@ -20,20 +20,20 @@ type Response struct {
 type Context struct {
 	Finder
 	*http.Request
-	ResponseHeader  http.Header
-	Callback        string //jsonp callback
-	Status          int
-	Error           AppError
-	Data            interface {} //The data to be written after the resource method has returned.
-	UserId          int64
-	writer          io.Writer
-	responseWriter  http.ResponseWriter
-	clientClosed    bool
-	written         int
-	config 	       *Config
-	Id              int64
-	pathSegments    []string
-	gaps            []string
+	ResponseHeader http.Header
+	Callback       string //jsonp callback
+	Status         int
+	Error          AppError
+	Data           interface{} //The data to be written after the resource method has returned.
+	UserId         int64
+	writer         io.Writer
+	responseWriter http.ResponseWriter
+	clientClosed   bool
+	written        int
+	config         *Config
+	Id             int64
+	pathSegments   []string
+	gaps           []string
 }
 
 var NoJsonBody = errors.New("jas.Context: no json body")
@@ -41,9 +41,9 @@ var NoJsonBody = errors.New("jas.Context: no json body")
 //Write and flush the data.
 //It can be used for http streaming or to write a portion of large amount of data.
 //If the type of the data is not []byte, it will be marshaled to json format.
-func (ctx *Context) FlushData(data interface {}) (written int, err error) {
+func (ctx *Context) FlushData(data interface{}) (written int, err error) {
 	var dataBytes []byte
-	switch data.(type){
+	switch data.(type) {
 	case []byte:
 		dataBytes = data.([]byte)
 	default:
@@ -89,7 +89,7 @@ func (ctx *Context) deferredResponse() {
 		var appErr AppError
 		if handled, ok := x.(AppError); ok {
 			appErr = handled
-		}else {
+		} else {
 			appErr = NewInternalError(x)
 		}
 		ctx.Error = appErr
@@ -103,9 +103,9 @@ func (ctx *Context) deferredResponse() {
 	var written int
 	if ctx.config.HijackWrite != nil {
 		written = ctx.config.HijackWrite(ctx.writer, ctx)
-	}else {
+	} else {
 		jsonBytes, _ := json.Marshal(resp)
-		if ctx.Callback != "" {// handle JSONP
+		if ctx.Callback != "" { // handle JSONP
 			if ctx.written == 0 {
 				ctx.ResponseHeader.Set("Content-Type", "application/javascript; charset=utf-8")
 				ctx.responseWriter.WriteHeader(ctx.Status)
@@ -114,7 +114,7 @@ func (ctx *Context) deferredResponse() {
 			b, _ := ctx.writer.Write(jsonBytes)
 			c, _ := ctx.writer.Write([]byte(");"))
 			written = a + b + c
-		}else {
+		} else {
 			if ctx.written == 0 {
 				ctx.responseWriter.WriteHeader(ctx.Status)
 			}
@@ -152,16 +152,15 @@ func (ctx *Context) PathSegment(index int) string {
 	return ctx.pathSegments[index]
 }
 
-
 //If the gap has multiple segments, the key should be
 //the segment defined in resource Gap method.
 //e.g. for gap ":domain/:language", use key ":domain"
 //to get the first gap segment, use key ":language" to get the second gap segment.
 //The first gap segment can also be gotten by empty string key "" for convenience.
 func (ctx *Context) GapSegment(key string) string {
-	for i:= 0; i < len(ctx.gaps); i++ {
+	for i := 0; i < len(ctx.gaps); i++ {
 		if key == "" {
-			return ctx.pathSegments[i + 1]
+			return ctx.pathSegments[i+1]
 		}
 		if key == ctx.gaps[i] {
 			return ctx.pathSegments[i+1]
@@ -182,7 +181,7 @@ func (ctx *Context) RequireUserId() int64 {
 
 //Unmarshal the request body into the interface.
 //It only works when you set Config option `DisableAutoUnmarshal` to true.
-func (ctx *Context) Unmarshal(in interface {}) error {
+func (ctx *Context) Unmarshal(in interface{}) error {
 	if !ctx.config.DisableAutoUnmarshal {
 		panic("Should only call it when  'DisableAutoUnmarshal' is set to true")
 	}
@@ -196,8 +195,8 @@ func (ctx *Context) Unmarshal(in interface {}) error {
 
 //If set Config option `DisableAutoUnmarshal` to true, you should call this method first before you can get body parameters in Finder methods..
 func (ctx *Context) UnmarshalInFinder() {
-	if ctx.value == nil && ctx.ContentLength > 0 && strings.Contains(ctx.Header.Get("Content-Type"), "application/json"){
-		var in interface {}
+	if ctx.value == nil && ctx.ContentLength > 0 && strings.Contains(ctx.Header.Get("Content-Type"), "application/json") {
+		var in interface{}
 		decoder := json.NewDecoder(ctx.Body)
 		decoder.UseNumber()
 		ctx.err = decoder.Decode(&in)

@@ -1,12 +1,11 @@
-
 package jas
 
 import (
-	"log"
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"runtime"
-	"bytes"
 	"strings"
 	"time"
 )
@@ -24,7 +23,7 @@ var StackFormat = "%s:%d(0x%x);"
 
 const (
 	timeFormat = "02/Jan/2006:15:04:05 -0700"
-	logFormat = "%v - %d [%v] \"%v %v %v\" 200 %d \"%v\" \"%v\"\n"
+	logFormat  = "%v - %d [%v] \"%v %v %v\" 200 %d \"%v\" \"%v\"\n"
 )
 
 //If RequestError and internalError is not sufficient for you application,
@@ -49,26 +48,26 @@ type AppError interface {
 
 //RequestError is an AppError implementation which Error() and Message() returns the same string.
 type RequestError struct {
-	Msg string
+	Msg        string
 	StatusCode int
 }
-func (re RequestError) Error() string{
+
+func (re RequestError) Error() string {
 	return re.Msg
 }
-func (re RequestError) Status() int{
+func (re RequestError) Status() int {
 	return re.StatusCode
 }
 
-func (re RequestError) Message() string{
+func (re RequestError) Message() string {
 	return re.Msg
 }
 
-func (re RequestError) Log(context *Context){
+func (re RequestError) Log(context *Context) {
 	if context.config.RequestErrorLogger != nil {
 		doLog(context.config.RequestErrorLogger, context, re, "-")
 	}
 }
-
 
 //InternalError is an AppError implementation which
 //returns "InternalError" message to the client
@@ -76,23 +75,23 @@ func (re RequestError) Log(context *Context){
 //any panic during a session will be recovered and wrapped in InternalError
 //and then logged.
 type InternalError struct {
-	Err error
+	Err        error
 	StatusCode int
 }
 
-func (ie InternalError) Status() int{
+func (ie InternalError) Status() int {
 	return ie.StatusCode
 }
 
 func (ie InternalError) Error() string {
-	return  ie.Err.Error()
+	return ie.Err.Error()
 }
 
-func (ie InternalError) Message() string{
+func (ie InternalError) Message() string {
 	return "InternalError"
 }
 
-func (ie InternalError) Log(context *Context){
+func (ie InternalError) Log(context *Context) {
 	if context.config.InternalErrorLogger != nil {
 		buf := new(bytes.Buffer)
 		for i := 3; ; i++ {
@@ -113,7 +112,7 @@ func (ie InternalError) Log(context *Context){
 	}
 }
 
-func doLog(logger *log.Logger, context *Context, err error, stack string){
+func doLog(logger *log.Logger, context *Context, err error, stack string) {
 	errStr := err.Error()
 	errStr = strings.Replace(errStr, "\n", ";", -1)
 	logger.Printf(
@@ -131,13 +130,13 @@ func doLog(logger *log.Logger, context *Context, err error, stack string){
 }
 
 //Make an RequestError with message which will be sent to the client.
-func NewRequestError(message string) RequestError{
+func NewRequestError(message string) RequestError {
 	return RequestError{message, RequestErrorStatusCode}
 }
 
 //Wrap an error to InternalError
-func NewInternalError(err interface {}) InternalError{
-	e, ok := err.(error);
+func NewInternalError(err interface{}) InternalError {
+	e, ok := err.(error)
 	if !ok {
 		e = errors.New(fmt.Sprint(err))
 	}

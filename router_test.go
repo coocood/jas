@@ -1,17 +1,17 @@
 package jas
 
 import (
-	"testing"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/coocood/assrt"
+	"log"
 	"net/http"
 	"net/http/httptest"
-	"github.com/coocood/assrt"
-	"encoding/json"
-	"strings"
-	"bytes"
-	"log"
 	"regexp"
-	"fmt"
 	"strconv"
+	"strings"
+	"testing"
 )
 
 var empty = fmt.Sprint("")
@@ -45,7 +45,7 @@ func (u *Users) Gap() string {
 	return ":username"
 }
 
-type UsersId struct {}
+type UsersId struct{}
 
 func (ui *UsersId) ImageUrl(ctx *Context) {}
 
@@ -119,7 +119,6 @@ func TestRouter(t *testing.T) {
 	assert.True(ok)
 }
 
-
 type Error struct {
 }
 
@@ -155,7 +154,6 @@ func TestError(t *testing.T) {
 }
 
 type Jsonp struct {
-
 }
 
 func (jp *Jsonp) Get(ctx *Context) {
@@ -195,7 +193,7 @@ func BenchmarkUsersPhotosIdBasic(b *testing.B) {
 
 func handleUsersPhotosId(w http.ResponseWriter, r *http.Request) {
 	segments := strings.Split(r.URL.Path, "/")
-	id, _ := strconv.ParseInt(segments[len(segments) - 1], 10, 64)
+	id, _ := strconv.ParseInt(segments[len(segments)-1], 10, 64)
 	resp := Response{}
 	resp.Data = id
 	jsonBytes, _ := json.Marshal(resp)

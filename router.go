@@ -1,18 +1,17 @@
-
 package jas
 
 import (
-	"net/http"
-	"reflect"
-	"strings"
-	"log"
-	"os"
-	"compress/gzip"
-	"sort"
-	"encoding/json"
 	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"io"
+	"log"
+	"net/http"
+	"os"
+	"reflect"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 var WordSeparator = "_"
@@ -40,7 +39,7 @@ type Config struct {
 	//return true to go on handle the request, return false to stop handling and response with header only.
 	//Defaults to nil
 	//You can set it to AllowCORS function to allow all CORS request.
-	HandleCORS func (*http.Request, http.Header) bool
+	HandleCORS func(*http.Request, http.Header) bool
 
 	//gzip is disabled by default. set true to enable it
 	EnableGzip bool
@@ -53,28 +52,28 @@ type Config struct {
 
 	//If set, it will be called after recovered from panic.
 	//Do time consuming work in the function will not increase response time because it runs in its own goroutine.
-	OnAppError func (AppError, *Context)
+	OnAppError func(AppError, *Context)
 
 	//If set, it will be called before calling the matched method.
-	BeforeServe func (*Context)
+	BeforeServe func(*Context)
 
 	//If set, the user id can be obtained by *Context.UserId and will be logged on error.
 	//Implementations can be like decode cookie value or token parameter.
-	ParseIdFunc func (*http.Request) int64
+	ParseIdFunc func(*http.Request) int64
 
 	//If set, the delimiter will be appended to the end of the data on every call to *Context.FlushData method.
 	FlushDelimiter []byte
 
 	//handler function for unhandled path request.
 	//default function just send `{"data":null,"error":"NotFound"}` with 404 status code.
-	OnNotFound func (http.ResponseWriter, *http.Request)
+	OnNotFound func(http.ResponseWriter, *http.Request)
 
 	//if you do not like the default json format `{"data":...,"error":...}`,
 	//you can define your own write function here.
 	//The io.Writer may be http.ResponseWriter or GzipWriter depends on if gzip is enabled.
 	//The errMessage is of type string or nil, it's not AppError.
 	//it should return the number of bytes has been written.
-	HijackWrite func (io.Writer, *Context) int
+	HijackWrite func(io.Writer, *Context) int
 
 	//If set to true, json request body will not be unmarshaled in Finder automatically.
 	//Then you will be able to call `Unmarshal` to unmarshal the body to a struct.
@@ -117,7 +116,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		defer gz.Close()
 		ctx.ResponseHeader.Set("Content-Encoding", "gzip")
 		ctx.writer = gz
-	}else {
+	} else {
 		ctx.writer = ctx.responseWriter
 	}
 	if router.ParseIdFunc != nil {
@@ -129,7 +128,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if router.BeforeServe != nil {
 		router.BeforeServe(ctx)
 	}
-	methodValue.Call([]reflect.Value {reflect.ValueOf(ctx)})
+	methodValue.Call([]reflect.Value{reflect.ValueOf(ctx)})
 }
 
 //Get the paths that have been handled by resources.
@@ -142,7 +141,7 @@ func (r *Router) HandledPaths(withBasePath bool) string {
 	}
 	for k, _ := range r.methodMap {
 		methodPath := strings.Split(k, " ")
-		handeldPath := methodPath[0]+ " " + basePath + methodPath[1]
+		handeldPath := methodPath[0] + " " + basePath + methodPath[1]
 		handledPaths = append(handledPaths, handeldPath)
 	}
 	sort.Strings(handledPaths)
@@ -155,7 +154,7 @@ func (r *Router) HandledPaths(withBasePath bool) string {
 // you can change if needed.
 // You can make multiple routers with different base path to handle requests to the same host.
 // See documentation about resources at the top of the file.
-func NewRouter(resources ...interface {}) *Router {
+func NewRouter(resources ...interface{}) *Router {
 	router := new(Router)
 	router.methodMap = map[string]reflect.Value{}
 	router.gapsMap = map[string][]string{}
@@ -172,11 +171,11 @@ func NewRouter(resources ...interface {}) *Router {
 		resNameSnakeLen := len(resNameSnake)
 		var isIdResource bool
 		var gap string
-		if resNameSnakeLen > 3 && resNameSnake[resNameSnakeLen - 3:] == "_id" {
-			resNameSnake = resNameSnake[:resNameSnakeLen - 3]
+		if resNameSnakeLen > 3 && resNameSnake[resNameSnakeLen-3:] == "_id" {
+			resNameSnake = resNameSnake[:resNameSnakeLen-3]
 			resNameSnake += "/:id"
 			isIdResource = true
-		}else if resWithGap, ok := v.(ResourceWithGap); ok{
+		} else if resWithGap, ok := v.(ResourceWithGap); ok {
 			gap = resWithGap.Gap()
 			router.gapsMap[resNameSnake] = strings.Split(gap, "/")
 			resNameSnake += "/" + gap
@@ -191,24 +190,24 @@ func NewRouter(resources ...interface {}) *Router {
 			methodWords := strings.Split(methodName, WordSeparator)
 			var hasHttpMethod bool
 			minIdMethodLen := 2
-			switch methodWords[0]{
+			switch methodWords[0] {
 			case "post", "get", "put", "delete":
 				hasHttpMethod = true
 				minIdMethodLen++
 			}
 			var isIdMethod bool
-			if !isIdResource && len(methodWords) >= minIdMethodLen && methodWords[len(methodWords) - 1] == "id" {
-				methodName = methodName[:len(methodName) - 3]
+			if !isIdResource && len(methodWords) >= minIdMethodLen && methodWords[len(methodWords)-1] == "id" {
+				methodName = methodName[:len(methodName)-3]
 				isIdMethod = true
 			}
 			if hasHttpMethod {
 				if len(methodWords) > 1 {
-					methodName = "/" + methodName[len(methodWords[0]) + 1:]
-				}else {
+					methodName = "/" + methodName[len(methodWords[0])+1:]
+				} else {
 					methodName = ""
 				}
 				httpMethod = strings.ToUpper(methodWords[0])
-			}else {
+			} else {
 				methodName = "/" + methodName
 			}
 			if isIdMethod {
@@ -276,8 +275,8 @@ func AllowCORS(r *http.Request, responseHeader http.Header) bool {
 func (r *Router) resolvePath(method string, rawPath string) (path string, id int64, segments []string, gaps []string) {
 	segments = strings.Split(rawPath, "/")
 	httpMethod := "GET"
-	switch method{
-	case "POST", "DETETE", "PUT":
+	switch method {
+	case "POST", "DELETE", "PUT":
 		httpMethod = method
 	}
 	path = httpMethod + " /" + segments[0]
@@ -291,7 +290,7 @@ func (r *Router) resolvePath(method string, rawPath string) (path string, id int
 		if len(segments) > 2 && segments[2] != "" {
 			path += "/" + segments[2]
 		}
-	}else{
+	} else {
 		gaps = r.gapsMap[segments[0]]
 		if gaps != nil {
 			path += "/" + strings.Join(gaps, "/")
