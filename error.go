@@ -18,6 +18,8 @@ var UnauthorizedStatusCode = 401
 
 var NotFoundStatusCode = 404
 
+var NotFoundError = RequestError{"Not Found", 404}
+
 //Stack trace format which formats file name, line number and program counter.
 var StackFormat = "%s:%d(0x%x);"
 

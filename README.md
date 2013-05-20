@@ -70,7 +70,7 @@ Define a struct type and its methods, methods should have one argement of type *
 
 ##Documentation
 
-See [Gowalker](http://gowalker.org/github.com/coocood/jas) for complete documentation.
+See [Gowalker](http://gowalker.org/github.com/coocood/jas) or [godoc](http://godoc.org/github.com/coocood/jas) for complete documentation.
 
 ##LICENSE
 
