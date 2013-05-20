@@ -257,7 +257,7 @@ func convertName(name string) string {
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 	var response Response
-	response.Error = "NotFound"
+	response.Error = "Not Found"
 	jsonbytes, _ := json.Marshal(response)
 	w.WriteHeader(NotFoundStatusCode)
 	w.Write(jsonbytes)
