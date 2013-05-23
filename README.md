@@ -3,6 +3,8 @@ JAS
 
 JAS (JSON API Server) is a simple and powerful REST API framework for Go.
 
+[![Build Status](https://drone.io/github.com/coocood/jas/status.png)](https://drone.io/github.com/coocood/jas/latest)
+
 ##Requirement
 
 Require Go 1.1, Go 1.03 is not supported.
