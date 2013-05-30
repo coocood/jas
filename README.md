@@ -5,11 +5,11 @@ JAS (JSON API Server) is a simple and powerful REST API framework for Go.
 
 [![Build Status](https://drone.io/github.com/coocood/jas/status.png)](https://drone.io/github.com/coocood/jas/latest)
 
-##Requirement
+## Requirement
 
 Require Go 1.1, Go 1.03 is not supported.
 
-##Key Features
+## Features
 
 * No need to manually define any url routing rules, the rules are defined by your resource struct names and method names.
 No more inconsistencies between your url path and your method name.
@@ -35,7 +35,7 @@ and provide a optional function parameter to do the extra error handlling work.
 
 * Highly configuarable.
 
-##Performance
+## Performance
 
 JAS is a thin layer on top of net/http package, it adds about 1000ns operation time on every request, which means 99% of the performance when the qps number is around 10000.
 
@@ -43,13 +43,13 @@ But JAS will be faster than any regular expression routing solution. a single re
 
 JAS router do not use regular expression, the routing performance would be constant as you define more resource and methods.
 
-##Install
+## Install
 
     go get github.com/coocood/jas
 
 Only depends on a small assert package `github.com/coocood/assrt` for testing.
 
-##Get Started
+## Get Started
 
 Define a struct type and its methods, methods should have one argement of type *jas.Context, no return value.
 
@@ -70,10 +70,14 @@ Define a struct type and its methods, methods should have one argement of type *
     }
 
 
-##Documentation
+## Documentation
 
 See [Gowalker](http://gowalker.org/github.com/coocood/jas) or [godoc](http://godoc.org/github.com/coocood/jas) for complete documentation.
 
-##LICENSE
+## LICENSE
 
 JAS is distributed under the terms of the MIT License. See [LICENSE](https://github.com/coocood/jas/blob/master/LICENSE) for details.
+
+## Contributiors
+
+[Jacob Olsen](https://github.com/jakeo)
