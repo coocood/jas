@@ -25,7 +25,7 @@ var StackFormat = "%s:%d(0x%x);"
 
 const (
 	timeFormat = "02/Jan/2006:15:04:05 -0700"
-	logFormat  = "%v - %d [%v] \"%v %v %v\" 200 %d \"%v\" \"%v\"\n"
+	logFormat  = "%v - %d [%v] \"%v %v %v\" %d %d \"%v\" \"%v\"\n"
 )
 
 //If RequestError and internalError is not sufficient for you application,
@@ -125,6 +125,7 @@ func doLog(logger *log.Logger, context *Context, err error, stack string) {
 		context.Method,
 		context.RequestURI,
 		context.Proto,
+		context.Status,
 		context.written,
 		errStr,
 		stack,
