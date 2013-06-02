@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/coocood/assrt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +23,7 @@ func (*Hello) Get(ctx *Context) {
 }
 
 func TestHelloWorld(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	req, _ := http.NewRequest("GET", "http://localhost/hello?name=world", nil)
 	router := NewRouter(new(Hello))
 	recorder := httptest.NewRecorder()
@@ -54,7 +53,7 @@ func (ui *UsersId) PostPost(ctx *Context) {}
 func (ui *UsersId) GetPost(ctx *Context) {}
 
 func TestRouter(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	router := NewRouter(new(Users))
 	router.BasePath = "/base/"
 	paths := strings.Split(router.HandledPaths(false), "\n")
@@ -131,7 +130,7 @@ func (h *Error) Internal(ctx *Context) {
 }
 
 func TestError(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	buffer := bytes.NewBuffer(nil)
 	router := NewRouter(new(Error))
 	router.RequestErrorLogger = log.New(buffer, "", 0)
@@ -162,7 +161,7 @@ func (jp *Jsonp) Get(ctx *Context) {
 }
 
 func TestJsonp(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	router := NewRouter(new(Jsonp))
 	req := NewGetRequest("", "jsonp", "callback", "dosomething")
 	recorder := httptest.NewRecorder()

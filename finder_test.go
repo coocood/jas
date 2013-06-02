@@ -1,7 +1,6 @@
 package jas
 
 import (
-	"github.com/coocood/assrt"
 	"net/http/httptest"
 	"regexp"
 	"testing"
@@ -40,7 +39,7 @@ func TestUnmarshal(t *testing.T) {
 	router := NewRouter(new(UnmarshalRes))
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, req)
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	assert.Equal(`{"data":{"a":"","b":null,"c":true,"d":12,"e":"str"},"error":null}`, recorder.Body.String())
 
 	req = NewPostJsonRequest("", "/unmarshal_res/unmarshal", []byte(jsonData))
@@ -51,7 +50,7 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestFinderString(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "e", "E", "o", "O")
 	ctx := new(Context)
 	ctx.Request = req
@@ -90,7 +89,7 @@ func TestFinderString(t *testing.T) {
 }
 
 func TestFinderInt(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	req := NewGetRequest("", "", "a", 1, "b", 2)
 	f := FinderWithRequest(req)
 	a := f.RequireInt("a")
@@ -104,7 +103,7 @@ func TestFinderInt(t *testing.T) {
 }
 
 func TestFinderStringLen(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	req := NewGetRequest("", "", "a", "1234567", "b", "语言文字")
 	f := FinderWithRequest(req)
 	_, err := f.FindStringLen(8, 10, "a")
@@ -122,7 +121,7 @@ func TestFinderStringLen(t *testing.T) {
 }
 
 func TestFinderRegexp(t *testing.T) {
-	assert := assrt.NewAssert(t)
+	assert := NewAssert(t)
 	req := NewGetRequest("", "", "a", "abcderg", "b", "语言文字")
 	f := FinderWithRequest(req)
 	_, err := f.FindStringMatch(regexp.MustCompile("\\w+"), "a")
