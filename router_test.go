@@ -105,6 +105,7 @@ func TestRouter(t *testing.T) {
 	_, ok = router.methodMap[path]
 	assert.True(ok)
 
+	router.AllowIntegerGap = true
 	req, _ = http.NewRequest("POST", "http://localhost/base/1/users/6/post", nil)
 	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
 	assert.Equal("POST /users/:id/post", path)
@@ -116,6 +117,16 @@ func TestRouter(t *testing.T) {
 	assert.Equal("GET /users/:id/post", path)
 	_, ok = router.methodMap[path]
 	assert.True(ok)
+
+	router = NewRouter(new(UsersId), new(Users))
+	router.BasePath = "/base/1/"
+	req, _ = http.NewRequest("GET", "http://localhost/base/1/users/5/post", nil)
+	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
+	assert.Equal("GET /users/:id/post", path)
+
+	router.AllowIntegerGap = true
+	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
+	assert.Equal("GET /users/:username/post", path)
 }
 
 type Error struct {

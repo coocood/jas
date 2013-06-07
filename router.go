@@ -80,6 +80,11 @@ type Config struct {
 	//If you still want to get body parameter with Finder methods in some cases, you can call `UnmarshalInFinder`
 	//explicitly before you get body parameters with Finder methods.
 	DisableAutoUnmarshal bool
+
+	//By default gap only matches non-integer segment, set true to allow gap to match integer segment.
+	//But then resource with gap will shadow id resource.
+	//e.g "/user/123" will be resolved to "User" that has "Gap" method instead of "UserId".
+	AllowIntegerGap bool
 }
 
 //Implements http.Handler interface.
@@ -285,13 +290,13 @@ func (r *Router) resolvePath(method string, rawPath string) (path string, id int
 		seg1 = segments[1]
 	}
 	id, err := strconv.ParseInt(seg1, 10, 64)
-	if err == nil {
+	gaps = r.gapsMap[segments[0]]
+	if err == nil && (len(gaps) == 0 || !r.AllowIntegerGap) {
 		path += "/:id"
 		if len(segments) > 2 && segments[2] != "" {
 			path += "/" + segments[2]
 		}
 	} else {
-		gaps = r.gapsMap[segments[0]]
 		if gaps != nil {
 			path += "/" + strings.Join(gaps, "/")
 		}
