@@ -17,7 +17,7 @@ import (
 var WordSeparator = "_"
 
 type Router struct {
-	methodMap map[string]reflect.Value
+	methodMap map[string]func(*Context)
 	gapsMap   map[string][]string
 	*Config
 }
@@ -95,7 +95,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	rawPath := r.URL.Path[len(router.BasePath):]
 	path, id, segments, gaps := router.resolvePath(r.Method, rawPath)
-	methodValue, ok := router.methodMap[path]
+	method, ok := router.methodMap[path]
 	if !ok {
 		router.OnNotFound(w, r)
 		return
@@ -133,7 +133,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if router.BeforeServe != nil {
 		router.BeforeServe(ctx)
 	}
-	methodValue.Call([]reflect.Value{reflect.ValueOf(ctx)})
+	method(ctx)
 }
 
 //Get the paths that have been handled by resources.
@@ -161,7 +161,7 @@ func (r *Router) HandledPaths(withBasePath bool) string {
 // See documentation about resources at the top of the file.
 func NewRouter(resources ...interface{}) *Router {
 	router := new(Router)
-	router.methodMap = map[string]reflect.Value{}
+	router.methodMap = map[string]func(*Context){}
 	router.gapsMap = map[string][]string{}
 	config := new(Config)
 	config.BasePath = "/"
@@ -223,7 +223,7 @@ func NewRouter(resources ...interface{}) *Router {
 				methodName = methodName[1:]
 			}
 			path := httpMethod + " /" + resNameSnake + methodName
-			router.methodMap[path] = methodValue
+			router.methodMap[path] = methodValue.Interface().(func(*Context))
 		}
 	}
 	return router
