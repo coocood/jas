@@ -26,12 +26,13 @@ type Context struct {
 	Error          AppError
 	Data           interface{} //The data to be written after the resource method has returned.
 	UserId         int64
+	Id             int64
+	Extra          interface{} //Store extra data generated/used by hook functions, e.g. 'BeforeServe'.
 	writer         io.Writer
 	responseWriter http.ResponseWriter
 	clientClosed   bool
 	written        int
 	config         *Config
-	Id             int64
 	pathSegments   []string
 	gaps           []string
 }

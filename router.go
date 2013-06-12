@@ -57,6 +57,9 @@ type Config struct {
 	//If set, it will be called before calling the matched method.
 	BeforeServe func(*Context)
 
+	//If set, it will be called after calling the matched method.
+	AfterServe func(*Context)
+
 	//If set, the user id can be obtained by *Context.UserId and will be logged on error.
 	//Implementations can be like decode cookie value or token parameter.
 	ParseIdFunc func(*http.Request) int64
@@ -134,6 +137,9 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		router.BeforeServe(ctx)
 	}
 	method(ctx)
+	if router.AfterServe != nil {
+		router.AfterServe(ctx)
+	}
 }
 
 //Get the paths that have been handled by resources.
