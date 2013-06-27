@@ -103,6 +103,7 @@ func (ctx *Context) deferredResponse() {
 	}
 	var written int
 	if ctx.config.HijackWrite != nil {
+		ctx.responseWriter.WriteHeader(ctx.Status)
 		written = ctx.config.HijackWrite(ctx.writer, ctx)
 	} else {
 		jsonBytes, _ := json.Marshal(resp)
