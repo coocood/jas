@@ -119,8 +119,10 @@ func (ctx *Context) deferredResponse() {
 		} else {
 			if ctx.written == 0 {
 				ctx.responseWriter.WriteHeader(ctx.Status)
+				written, _ = ctx.writer.Write(jsonBytes)
+			} else if resp.Data != nil || resp.Error != nil {
+				written, _ = ctx.writer.Write(jsonBytes)
 			}
-			written, _ = ctx.writer.Write(jsonBytes)
 		}
 	}
 	if ctx.Error != nil {
