@@ -80,4 +80,4 @@ JAS is distributed under the terms of the MIT License. See [LICENSE](https://git
 
 ## Contributiors
 
-[Jacob Olsen](https://github.com/jakeo)
+[Jacob Olsen](https://github.com/jakeo), [doun](https://github.com/doun)
