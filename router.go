@@ -270,6 +270,7 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	var response Response
 	response.Error = "Not Found"
 	jsonbytes, _ := json.Marshal(response)
+	w.Header().Set("Connection", "close")
 	w.WriteHeader(NotFoundStatusCode)
 	w.Write(jsonbytes)
 }
