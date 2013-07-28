@@ -207,3 +207,11 @@ func (ctx *Context) UnmarshalInFinder() {
 		ctx.value = in
 	}
 }
+
+type ContextWriter struct {
+	Ctx *Context
+}
+
+func (cw ContextWriter) Write(p []byte) (n int, err error) {
+	return cw.Ctx.FlushData(p)
+}
