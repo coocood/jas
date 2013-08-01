@@ -52,6 +52,18 @@ func (ui *UsersId) PostPost(ctx *Context) {}
 
 func (ui *UsersId) GetPost(ctx *Context) {}
 
+type Stringusers struct{}
+
+func (*Stringusers) Get(ctx *Context) {}
+
+type stringusers struct{}
+
+func (u *stringusers) Gap() string {
+	return ":id"
+}
+
+func (*stringusers) Get(ctx *Context) {}
+
 func TestRouter(t *testing.T) {
 	assert := NewAssert(t)
 	router := NewRouter(new(Users))
@@ -127,6 +139,15 @@ func TestRouter(t *testing.T) {
 	router.AllowIntegerGap = true
 	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
 	assert.Equal("GET /users/:username/post", path)
+
+	router = NewRouter(new(Stringusers), new(stringusers))
+	router.BasePath = "/base/2/"
+	req, _ = http.NewRequest("GET", "http://localhost/base/2/stringusers", nil)
+	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
+	assert.Equal("GET /stringusers", path)
+	req, _ = http.NewRequest("GET", "http://localhost/base/2/stringusers/51f959801a2a7c3300000000", nil)
+	path, id, segments, gaps = router.resolvePath(req.Method, req.URL.Path[len(router.BasePath):])
+	assert.Equal("GET /stringusers/:id", path)
 }
 
 type Error struct {
