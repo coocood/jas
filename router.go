@@ -304,7 +304,7 @@ func (r *Router) resolvePath(method string, rawPath string) (path string, id int
 			path += "/" + segments[2]
 		}
 	} else {
-		if gaps != nil {
+		if gaps != nil && seg1 != "" {
 			path += "/" + strings.Join(gaps, "/")
 		}
 		methodIndex := len(gaps) + 1
