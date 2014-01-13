@@ -62,6 +62,20 @@ func (finder Finder) FindString(paths ...interface{}) (string, error) {
 	return "", WrongTypeError
 }
 
+// Looks up the path, and returns empty string if not present.
+func (finder Finder) FindSafeString(paths ...interface{}) (string, error) {
+	return finder.FindOptionalString("", paths...)
+}
+
+// Looks up the given path and returns a default value if not present.
+func (finder Finder) FindOptionalString(val string, paths ...interface{}) (string, error) {
+	if s, err := finder.FindString(paths...); err != nil {
+		return val, nil
+	} else {
+		return s, err
+	}
+}
+
 func (finder Finder) FindStringLen(min, max int, paths ...interface{}) (string, error) {
 	s, err := finder.FindString(paths...)
 	if err != nil {

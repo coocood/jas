@@ -129,3 +129,38 @@ func TestFinderRegexp(t *testing.T) {
 	_, err = f.FindStringMatch(regexp.MustCompile("\\d+"), "a")
 	assert.NotNil(err)
 }
+
+func TestFinderSafeString(t *testing.T) {
+	assert := NewAssert(t)
+	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "year", "2013", "month", "May")
+	ctx := new(Context)
+	ctx.Request = req
+	ctx.Finder = FinderWithRequest(req)
+	ctx.UnmarshalInFinder()
+	f := ctx.Finder
+	s, err := f.FindSafeString("xyz")
+	assert.Nil(err)
+	assert.Equal("", s, "Should return empty value.")
+
+	s, err = f.FindSafeString("year")
+	assert.Nil(err)
+	assert.Equal("2013", s, "Should return valid value.")
+}
+
+func TestFinderOptionalString(t *testing.T) {
+	assert := NewAssert(t)
+	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "year", "2013", "month", "May")
+	ctx := new(Context)
+	ctx.Request = req
+	ctx.Finder = FinderWithRequest(req)
+	ctx.UnmarshalInFinder()
+	f := ctx.Finder
+	s, err := f.FindOptionalString("default", "xyz")
+	assert.Nil(err)
+	assert.Equal("default", s, "Should return default value.")
+
+	// Use the found value
+	s, err = f.FindOptionalString("not_used", "month")
+	assert.Nil(err)
+	assert.Equal("May", s, "Should ignore default if string found.")
+}
