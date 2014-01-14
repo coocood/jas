@@ -130,23 +130,6 @@ func TestFinderRegexp(t *testing.T) {
 	assert.NotNil(err)
 }
 
-func TestFinderSafeString(t *testing.T) {
-	assert := NewAssert(t)
-	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "year", "2013", "month", "May")
-	ctx := new(Context)
-	ctx.Request = req
-	ctx.Finder = FinderWithRequest(req)
-	ctx.UnmarshalInFinder()
-	f := ctx.Finder
-	s, err := f.FindSafeString("xyz")
-	assert.Nil(err)
-	assert.Equal("", s, "Should return empty value.")
-
-	s, err = f.FindSafeString("year")
-	assert.Nil(err)
-	assert.Equal("2013", s, "Should return valid value.")
-}
-
 func TestFinderOptionalString(t *testing.T) {
 	assert := NewAssert(t)
 	req := NewPostJsonRequest("", "/test_finder", []byte(jsonData), "year", "2013", "month", "May")
