@@ -7,7 +7,7 @@ JAS (JSON API Server) is a simple and powerful REST API framework for Go. [ä¸­æ–
 
 ## Requirement
 
-Require Go 1.1, Go 1.03 is not supported.
+Require Go 1.1+.
 
 ## Features
 

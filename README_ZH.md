@@ -7,7 +7,7 @@ JAS (JSON API Server) 是一个简单的功能强大REST API框架
 
 ## 版本支持
 
-仅支持Go 1.1
+Go 1.1+
 
 ## 特性
 
