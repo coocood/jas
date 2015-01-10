@@ -260,6 +260,16 @@ func (finder Finder) RequireFloat(paths ...interface{}) float64 {
 	return f
 }
 
+func (finder Finder) RequirePositiveFloat(paths ...interface{}) float64 {
+	f, err := finder.FindFloat(paths...)
+	if err != nil {
+		doPanic(InvalidErrorFormat, paths...)
+	} else if f < 0 {
+		doPanic(NotPositiveErrorFormat, paths...)
+	}
+	return f
+}
+
 func (finder Finder) FindBool(paths ...interface{}) (bool, error) {
 	if s := finder.findFormString(paths...); s != "" {
 		return strconv.ParseBool(s)
