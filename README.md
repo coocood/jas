@@ -52,7 +52,7 @@ Only depends on a small assert package `github.com/coocood/assrt` for testing.
 
 ## Get Started
 
-Define a struct type and its methods, methods should have one argement of type *jas.Context, no return value.
+Define a struct type and its methods, methods should have one argument of type *jas.Context, no return value.
 
     type Hello struct {}
 
