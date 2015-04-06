@@ -202,7 +202,7 @@ func NewRouter(resources ...interface{}) *Router {
 			var hasHttpMethod bool
 			minIdMethodLen := 2
 			switch methodWords[0] {
-			case "post", "get", "put", "delete":
+			case "post", "get", "put", "delete", "patch":
 				hasHttpMethod = true
 				minIdMethodLen++
 			}
@@ -288,7 +288,7 @@ func (r *Router) resolvePath(method string, rawPath string) (path string, id int
 	segments = strings.Split(rawPath, "/")
 	httpMethod := "GET"
 	switch method {
-	case "POST", "DELETE", "PUT":
+	case "POST", "DELETE", "PUT", "PATCH":
 		httpMethod = method
 	}
 	path = httpMethod + " /" + segments[0]
